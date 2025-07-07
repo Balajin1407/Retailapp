@@ -6,9 +6,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
+import { toast } from "@/hooks/use-toast";
 
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart, getTotalPrice, getTotalItems } = useCart();
+
+  const handleRemoveItem = (productId: number, productName: string) => {
+    removeFromCart(productId);
+    toast({
+      title: "Item removed",
+      description: `${productName} has been removed from your cart.`,
+    });
+  };
 
   if (cart.length === 0) {
     return (
@@ -116,7 +125,7 @@ const Cart = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => removeFromCart(item.product.id)}
+                        onClick={() => handleRemoveItem(item.product.id, item.product.name)}
                         className="text-destructive hover:text-destructive mt-2"
                       >
                         <Trash2 className="h-4 w-4 mr-1" />
@@ -152,9 +161,11 @@ const Cart = () => {
                   </div>
                 </div>
 
-                <Button className="w-full btn-primary mb-4">
-                  Proceed to Checkout
-                </Button>
+                <Link to="/checkout">
+                  <Button className="w-full btn-primary mb-4">
+                    Continue to Buy
+                  </Button>
+                </Link>
                 
                 <Link to="/products">
                   <Button variant="outline" className="w-full">

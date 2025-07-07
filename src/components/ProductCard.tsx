@@ -1,9 +1,12 @@
+
 import { Link } from "react-router-dom";
 import { ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Product } from "@/data/products";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -11,7 +14,16 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, showImage = true }: ProductCardProps) => {
+  const { addToCart } = useCart();
   const isLowStock = product.stock < 50;
+
+  const handleAddToCart = () => {
+    addToCart(product);
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
 
   return (
     <Card className="card-product card-hover group">
@@ -64,7 +76,7 @@ const ProductCard = ({ product, showImage = true }: ProductCardProps) => {
       
       <CardFooter className="p-4 pt-0">
         <div className="flex gap-2 w-full">
-          <Button size="sm" className="btn-primary flex-1">
+          <Button size="sm" className="btn-primary flex-1" onClick={handleAddToCart}>
             <ShoppingCart className="h-4 w-4 mr-2" />
             Add to Cart
           </Button>
