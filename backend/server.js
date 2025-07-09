@@ -23,6 +23,9 @@ app.get('/', (req, res) => {
 const productRoutes = require('./routes/products');
 app.use('/api/products', productRoutes);
 
+const categoryRoutes = require('./routes/categories');
+app.use('/api/categories', categoryRoutes);
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
