@@ -1,3 +1,4 @@
+// module.exports = router;
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
@@ -11,7 +12,7 @@ function getPagination(page, limit, total) {
     total,
     totalPages,
     hasNext: page < totalPages,
-    hasPrev: page > 1
+    hasPrev: page > 1,
   };
 }
 
@@ -27,15 +28,8 @@ router.get('/', async (req, res) => {
 
   res.json({
     products,
-    pagination: getPagination(page, limit, total)
+    pagination: getPagination(page, limit, total),
   });
-});
-
-// 2. GET /api/products/:id (Product Details)
-router.get('/:id', async (req, res) => {
-  const product = await Product.findOne({ "Internal ID": req.params.id });
-  if (!product) return res.status(404).json({ message: 'Product not found' });
-  res.json(product);
 });
 
 // 3. GET /api/products/search (Search by Internal ID or Name)
@@ -47,8 +41,8 @@ router.get('/search', async (req, res) => {
   const query = {
     $or: [
       { "Internal ID": { $regex: q, $options: 'i' } },
-      { Name: { $regex: q, $options: 'i' } }
-    ]
+      { Name: { $regex: q, $options: 'i' } },
+    ],
   };
 
   const total = await Product.countDocuments(query);
@@ -58,7 +52,7 @@ router.get('/search', async (req, res) => {
 
   res.json({
     products,
-    pagination: getPagination(page, limit, total)
+    pagination: getPagination(page, limit, total),
   });
 });
 
@@ -70,6 +64,13 @@ router.get('/latest', async (req, res) => {
     .limit(limit);
 
   res.json({ products });
+});
+
+// 2. GET /api/products/:id (Product Details)
+router.get('/:id', async (req, res) => {
+  const product = await Product.findOne({ "Internal ID": req.params.id });
+  if (!product) return res.status(404).json({ message: 'Product not found' });
+  res.json(product);
 });
 
 module.exports = router; 
