@@ -69,6 +69,7 @@ router.get('/latest', async (req, res) => {
     .sort({ Index: -1 })
     .limit(limit);
 
+  // Always return an array, even if empty
   res.json({ products });
 });
 
