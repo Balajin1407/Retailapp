@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 import { toast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
@@ -15,7 +16,9 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, showImage = true }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const isLowStock = product.stock < 50;
+  const isProductFavorite = isFavorite(product.id);
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -23,6 +26,22 @@ const ProductCard = ({ product, showImage = true }: ProductCardProps) => {
       title: "Added to cart",
       description: `${product.name} has been added to your cart.`,
     });
+  };
+
+  const handleToggleFavorite = () => {
+    if (isProductFavorite) {
+      removeFromFavorites(product.id);
+      toast({
+        title: "Removed from favorites",
+        description: `${product.name} has been removed from your favorites.`,
+      });
+    } else {
+      addToFavorites(product);
+      toast({
+        title: "Added to favorites",
+        description: `${product.name} has been added to your favorites.`,
+      });
+    }
   };
 
   return (
@@ -80,8 +99,12 @@ const ProductCard = ({ product, showImage = true }: ProductCardProps) => {
             <ShoppingCart className="h-4 w-4 mr-2" />
             Add to Cart
           </Button>
-          <Button variant="outline" size="sm">
-            <Heart className="h-4 w-4" />
+          <Button 
+            variant={isProductFavorite ? "default" : "outline"} 
+            size="sm"
+            onClick={handleToggleFavorite}
+          >
+            <Heart className={`h-4 w-4 ${isProductFavorite ? 'fill-current' : ''}`} />
           </Button>
         </div>
       </CardFooter>

@@ -8,10 +8,12 @@ import { Separator } from "@/components/ui/separator";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
+import { useOrders } from "@/contexts/OrdersContext";
 import { toast } from "@/hooks/use-toast";
 
 const Payment = () => {
   const { cart, getTotalPrice, getTotalItems, clearCart } = useCart();
+  const { addOrder } = useOrders();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -20,6 +22,9 @@ const Payment = () => {
     
     // Simulate payment processing
     setTimeout(() => {
+      // Add order to history before clearing cart
+      addOrder(cart, getTotalPrice());
+      
       toast({
         title: "Payment Successful",
         description: "Your order has been processed successfully!",
