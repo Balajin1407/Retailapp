@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import hero1 from "@/assets/hero-1.jpg";
-import hero2 from "@/assets/hero-2.jpg";
-import hero3 from "@/assets/hero-3.jpg";
 
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -11,24 +8,24 @@ const HeroSlider = () => {
   const slides = [
     {
       id: 1,
-      image: hero1,
-      title: "Latest Tech & Electronics",
-      subtitle: "Discover cutting-edge devices and premium technology",
+      image: "/lovable-uploads/23d1296d-ff2c-4855-ac80-08e8e97ac500.png",
+      title: "Premium Tech Accessories",
+      subtitle: "Discover cutting-edge headphones, smartwatches and mobile devices",
       buttonText: "Shop Electronics"
     },
     {
       id: 2,
-      image: hero2,
-      title: "Modern Home & Lifestyle",
-      subtitle: "Transform your space with beautiful furniture and decor",
-      buttonText: "Shop Home"
+      image: "/lovable-uploads/2d04f8a6-306a-490e-bdb3-82c2c80ce8e0.png",
+      title: "Workspace Essentials",
+      subtitle: "Complete your setup with premium keyboards, headphones and accessories",
+      buttonText: "Shop Accessories"
     },
     {
       id: 3,
-      image: hero3,
-      title: "Fashion & Style",
-      subtitle: "Explore our collection of premium clothing and accessories",
-      buttonText: "Shop Fashion"
+      image: "/lovable-uploads/3935a316-4ebf-4a08-8a67-bfcb1321b5d9.png",
+      title: "Apple Ecosystem",
+      subtitle: "iPhones, AirPods, Apple Watch and more premium Apple products",
+      buttonText: "Shop Apple"
     }
   ];
 
