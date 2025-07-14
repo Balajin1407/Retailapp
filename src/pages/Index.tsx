@@ -2,10 +2,22 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSlider from "@/components/HeroSlider";
 import ProductCard from "@/components/ProductCard";
-import { getLatestProducts } from "@/data/products";
+import { useEffect, useState } from "react";
+import { fetchLatestProducts, Product } from "@/lib/productApi";
 
 const Index = () => {
-  const latestProducts = getLatestProducts(10);
+  const [latestProducts, setLatestProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const products = await fetchLatestProducts(10);
+      setLatestProducts(products);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,7 +39,9 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {latestProducts.map((product) => (
+            {loading ? (
+              <div className="col-span-full text-center py-12">Loading...</div>
+            ) : latestProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

@@ -8,8 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { getProductById, getProductsByCategory } from "@/data/products";
-import { Product } from "@/data/products";
+import { fetchProductById, fetchProductsByCategory, Product } from "@/lib/productApi";
 
 const ProductDetails = () => {
   const [searchParams] = useSearchParams();
@@ -21,20 +20,23 @@ const ProductDetails = () => {
   const productId = searchParams.get("id");
 
   useEffect(() => {
-    const id = productId ? parseInt(productId) : null;
-    if (id) {
-      const foundProduct = getProductById(id);
-      setProduct(foundProduct);
-      
-      if (foundProduct) {
-        // Get similar products from same category
-        const similar = getProductsByCategory(foundProduct.category, 6)
-          .filter(p => p.id !== foundProduct.id)
-          .slice(0, 5);
-        setSimilarProducts(similar);
+    const fetchData = async () => {
+      setLoading(true);
+      const id = productId ? parseInt(productId) : null;
+      if (id) {
+        const foundProduct = await fetchProductById(id);
+        setProduct(foundProduct);
+        if (foundProduct) {
+          // Get similar products from same category
+          const similar = (await fetchProductsByCategory(foundProduct.category, 6))
+            .filter(p => p.id !== foundProduct.id)
+            .slice(0, 5);
+          setSimilarProducts(similar);
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+    fetchData();
   }, [productId]);
 
   const handleQuantityChange = (change: number) => {

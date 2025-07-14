@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -6,22 +7,43 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { allProducts, searchProductsByInternalId } from "@/data/products";
+import { fetchAllProducts, fetchProductsByCategory, searchProductsByQuery, Product } from "@/lib/productApi";
 
 const Products = () => {
+  const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const productsPerPage = 50;
 
-  // Search and sort products
-  const filteredAndSortedProducts = useMemo(() => {
-    let filtered = searchTerm 
-      ? searchProductsByInternalId(searchTerm)
-      : allProducts;
+  const category = searchParams.get("category");
+  // Map URL category to API category (handle dashes and case)
+  const normalizedCategory = category
+    ? category.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())
+    : null;
 
-    // Sort products
-    const sorted = [...filtered].sort((a, b) => {
+  useEffect(() => {
+    setLoading(true);
+    const fetchProducts = async () => {
+      let data: Product[] = [];
+      if (searchTerm) {
+        data = await searchProductsByQuery(searchTerm);
+      } else if (normalizedCategory) {
+        data = await fetchProductsByCategory(normalizedCategory);
+      } else {
+        data = await fetchAllProducts();
+      }
+      setProducts(data);
+      setLoading(false);
+    };
+    fetchProducts();
+  }, [searchTerm, normalizedCategory]);
+
+  // Sort products
+  const filteredAndSortedProducts = useMemo(() => {
+    const sorted = [...products].sort((a, b) => {
       switch (sortBy) {
         case "name":
           return a.name.localeCompare(b.name);
@@ -35,9 +57,8 @@ const Products = () => {
           return 0;
       }
     });
-
     return sorted;
-  }, [searchTerm, sortBy]);
+  }, [products, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedProducts.length / productsPerPage);
@@ -108,7 +129,7 @@ const Products = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">All Products</h1>
           <p className="text-muted-foreground">
-            Showing {filteredAndSortedProducts.length} products
+            {loading ? 'Loading products...' : `Showing ${filteredAndSortedProducts.length} products`}
           </p>
         </div>
 
@@ -142,13 +163,15 @@ const Products = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
-          {paginatedProducts.map((product) => (
+          {loading ? (
+            <div className="col-span-full text-center py-12">Loading...</div>
+          ) : paginatedProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
         {/* No Results Message */}
-        {filteredAndSortedProducts.length === 0 && (
+        {!loading && filteredAndSortedProducts.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No products found matching your search.</p>
           </div>
