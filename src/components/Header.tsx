@@ -1,13 +1,15 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingCart, Menu, Search } from "lucide-react";
+import { ShoppingCart, Menu, Search, Heart, Package } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useCart } from "@/contexts/CartContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 const Header = () => {
   const location = useLocation();
   const { getTotalItems } = useCart();
+  const { favorites } = useFavorites();
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -40,6 +42,22 @@ const Header = () => {
             >
               Products
             </Link>
+            <Link
+              to="/favorites"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/favorites") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              Favorites
+            </Link>
+            <Link
+              to="/orders"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/orders") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              Orders
+            </Link>
           </nav>
 
           {/* Search Bar - Desktop */}
@@ -55,6 +73,23 @@ const Header = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
+            <Link to="/favorites">
+              <Button variant="ghost" size="icon" className="relative">
+                <Heart className="h-5 w-5" />
+                {favorites.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {favorites.length}
+                  </span>
+                )}
+              </Button>
+            </Link>
+            
+            <Link to="/orders">
+              <Button variant="ghost" size="icon">
+                <Package className="h-5 w-5" />
+              </Button>
+            </Link>
+            
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
