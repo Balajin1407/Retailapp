@@ -4,8 +4,13 @@ const Product = require('../models/Product');
 
 // GET /api/categories (Categories List)
 router.get('/', async (req, res) => {
-  const categories = await Product.distinct('Category');
-  res.json(categories);
+  try {
+    const categories = await Product.distinct('Category');
+    res.json(categories);
+  } catch (err) {
+    console.error('Error in GET /api/categories:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 module.exports = router; 
