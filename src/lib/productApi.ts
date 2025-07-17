@@ -76,4 +76,13 @@ export async function searchProductsByQuery(query: string): Promise<Product[]> {
 export async function searchProductsByInternalId(searchTerm: string): Promise<Product[]> {
   // For backward compatibility, but now uses the new search endpoint
   return searchProductsByQuery(searchTerm);
+}
+
+// Fetch products for a specific page (server-side pagination)
+export async function fetchProductsPaginated(page = 1) {
+  const res = await axios.get(`${API_URL}?page=${page}`);
+  return {
+    products: res.data.products.map(mapApiProduct),
+    pagination: res.data.pagination,
+  };
 } 

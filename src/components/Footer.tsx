@@ -1,12 +1,64 @@
 import { Link } from "react-router-dom";
 
+// Mapping of API categories to main footer categories
+const categoryMap = {
+  Electronics: [
+    "Headphones & Earbuds",
+    "Laptops & Computers",
+    "Smartphones",
+    "Smartwatches",
+    "Cameras & Accessories",
+    "Office Supplies",
+    "Books & Stationery",
+    "Fitness Equipment",
+    "Home & Kitchen",
+    "Automotive",
+    "Camping & Hiking",
+    "Sports & Outdoors",
+    "Team Sports",
+    "Toys & Games",
+    "Cleaning Supplies",
+    "Accessories (Bags, Hats, Belts)",
+  ],
+  Furniture: [
+    "Furniture"
+  ],
+  Clothing: [
+    "Clothing & Apparel",
+    "Men's Clothing",
+    "Women's Clothing",
+    "Kids' Clothing",
+    "Shoes & Footwear"
+  ],
+  "Home & Garden": [
+    "Home Decor",
+    "Bedding & Bath",
+    "Kitchen Appliances",
+    "Grooming Tools",
+    "Haircare",
+    "Skincare",
+    "Makeup",
+    "Beauty & Personal Care",
+    "Fragrances",
+    "Health & Wellness",
+    "Fishing & Hunting",
+    "Cycling"
+  ]
+};
+
+// Helper to build category query string for each main category
+function buildCategoryQuery(categories: string[]) {
+  // Use comma-separated for multi-category filtering
+  return `/products?category=${encodeURIComponent(categories.join(","))}`;
+}
+
 const Footer = () => {
   const footerLinks = {
     shop: [
-      { name: "Electronics", href: "/products?category=electronics" },
-      { name: "Furniture", href: "/products?category=furniture" },
-      { name: "Clothing", href: "/products?category=clothing" },
-      { name: "Home & Garden", href: "/products?category=home-garden" },
+      { name: "Electronics", href: buildCategoryQuery(categoryMap.Electronics) },
+      { name: "Furniture", href: buildCategoryQuery(categoryMap.Furniture) },
+      { name: "Clothing", href: buildCategoryQuery(categoryMap.Clothing) },
+      { name: "Home & Garden", href: buildCategoryQuery(categoryMap["Home & Garden"]) },
     ],
     customerService: [
       { name: "Contact Us", href: "/contact" },

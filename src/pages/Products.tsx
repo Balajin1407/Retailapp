@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,77 +7,53 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { fetchAllProducts, fetchProductsByCategory, searchProductsByQuery, Product } from "@/lib/productApi";
+import { fetchProductsPaginated, Product } from "@/lib/productApi";
 
 const Products = () => {
-  const [searchParams] = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const productsPerPage = 50;
-
-  const category = searchParams.get("category");
-  // Map URL category to API category (handle dashes and case)
-  const normalizedCategory = category
-    ? category.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())
-    : null;
+  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
+  const [sortBy, setSortBy] = useState("name");
 
   useEffect(() => {
     setLoading(true);
     const fetchProducts = async () => {
-      let data: Product[] = [];
-      if (searchTerm) {
-        data = await searchProductsByQuery(searchTerm);
-      } else if (normalizedCategory) {
-        data = await fetchProductsByCategory(normalizedCategory);
-      } else {
-        data = await fetchAllProducts();
+      try {
+        const { products, pagination } = await fetchProductsPaginated(currentPage);
+        setProducts(products);
+        setPagination(pagination);
+      } catch (e) {
+        setProducts([]);
+        setPagination({ page: 1, totalPages: 1, total: 0 });
       }
-      setProducts(data);
       setLoading(false);
     };
     fetchProducts();
-  }, [searchTerm, normalizedCategory]);
+  }, [currentPage]);
 
-  // Sort products
-  const filteredAndSortedProducts = useMemo(() => {
-    const sorted = [...products].sort((a, b) => {
-      switch (sortBy) {
-        case "name":
-          return a.name.localeCompare(b.name);
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
-        case "stock":
-          return b.stock - a.stock;
-        default:
-          return 0;
-      }
-    });
-    return sorted;
-  }, [products, sortBy]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredAndSortedProducts.length / productsPerPage);
-  const paginatedProducts = filteredAndSortedProducts.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
-  );
-
-  // Reset to first page when search or sort changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, sortBy]);
+  // Sort products client-side (optional, can be removed if not needed)
+  const sortedProducts = [...products].sort((a, b) => {
+    switch (sortBy) {
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "price-low":
+        return a.price - b.price;
+      case "price-high":
+        return b.price - a.price;
+      case "stock":
+        return b.stock - a.stock;
+      default:
+        return 0;
+    }
+  });
 
   const handlePrevPage = () => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
   const handleNextPage = () => {
-    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+    setCurrentPage((prev) => Math.min(prev + 1, pagination.totalPages));
   };
 
   const handlePageClick = (page: number) => {
@@ -88,19 +64,19 @@ const Products = () => {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+    const { page, totalPages } = pagination;
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      if (currentPage <= 3) {
+      if (page <= 3) {
         for (let i = 1; i <= 4; i++) {
           pages.push(i);
         }
         pages.push("...");
         pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
+      } else if (page >= totalPages - 2) {
         pages.push(1);
         pages.push("...");
         for (let i = totalPages - 3; i <= totalPages; i++) {
@@ -109,44 +85,29 @@ const Products = () => {
       } else {
         pages.push(1);
         pages.push("...");
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+        for (let i = page - 1; i <= page + 1; i++) {
           pages.push(i);
         }
         pages.push("...");
         pages.push(totalPages);
       }
     }
-    
     return pages;
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">All Products</h1>
           <p className="text-muted-foreground">
-            {loading ? 'Loading products...' : `Showing ${filteredAndSortedProducts.length} products`}
+            {loading ? 'Loading products...' : `Showing page ${pagination.page} of ${pagination.totalPages} (${pagination.total} products)`}
           </p>
         </div>
-
-        {/* Search and Filters */}
+        {/* Sort Dropdown */}
         <div className="mb-8 flex flex-col md:flex-row gap-4">
-          {/* Search by Internal ID */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search by internal ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Sort Dropdown */}
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full md:w-48">
               <Filter className="h-4 w-4 mr-2" />
@@ -160,25 +121,22 @@ const Products = () => {
             </SelectContent>
           </Select>
         </div>
-
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
           {loading ? (
             <div className="col-span-full text-center py-12">Loading...</div>
-          ) : paginatedProducts.map((product) => (
+          ) : sortedProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
-
         {/* No Results Message */}
-        {!loading && filteredAndSortedProducts.length === 0 && (
+        {!loading && products.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No products found matching your search.</p>
+            <p className="text-muted-foreground">No products found.</p>
           </div>
         )}
-
         {/* Pagination */}
-        {totalPages > 1 && (
+        {pagination.totalPages > 1 && (
           <div className="flex items-center justify-center space-x-2">
             <Button
               variant="outline"
@@ -187,7 +145,6 @@ const Products = () => {
             >
               Previous
             </Button>
-            
             {getPageNumbers().map((page, index) => (
               page === "..." ? (
                 <span key={index} className="px-3 py-2">...</span>
@@ -202,18 +159,16 @@ const Products = () => {
                 </Button>
               )
             ))}
-            
             <Button
               variant="outline"
               onClick={handleNextPage}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === pagination.totalPages}
             >
               Next
             </Button>
           </div>
         )}
       </main>
-
       <Footer />
     </div>
   );
