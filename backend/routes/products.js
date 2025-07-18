@@ -43,12 +43,20 @@ router.get('/search', async (req, res) => {
     let limit = Math.min(parseInt(req.query.limit) || 50, 100);
     const q = req.query.q || '';
 
-    const query = {
-      $or: [
-        { "Internal ID": { $regex: q, $options: 'i' } },
-        { Name: { $regex: q, $options: 'i' } },
-      ],
-    };
+    let query = {};
+    if (q) {
+      // Build a regex to match both singular and plural forms
+      let base = q.toLowerCase();
+      let regex;
+      if (base.endsWith('s')) {
+        // If query ends with 's', also match without 's'
+        regex = new RegExp(`^${base}$|^${base.slice(0, -1)}$`, 'i');
+      } else {
+        // If query doesn't end with 's', also match with 's'
+        regex = new RegExp(`^${base}$|^${base}s$`, 'i');
+      }
+      query = { Name: { $regex: regex } };
+    }
 
     const total = await Product.countDocuments(query);
     const products = await Product.find(query, { Description: 0 })
