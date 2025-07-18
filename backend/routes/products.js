@@ -15,6 +15,7 @@ function getPagination(page, limit, total) {
   };
 }
 
+console.log("Registering route: /");
 // 1. GET /api/products (Product Listing)
 router.get('/', async (req, res) => {
   try {
@@ -36,6 +37,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+console.log("Registering route: /search");
 // 3. GET /api/products/search (Search by Internal ID or Name)
 router.get('/search', async (req, res) => {
   try {
@@ -71,6 +73,7 @@ router.get('/search', async (req, res) => {
   }
 });
 
+console.log("Registering route: /latest");
 // 5. GET /api/products/latest (Latest Products)
 router.get('/latest', async (req, res) => {
   try {
@@ -86,6 +89,7 @@ router.get('/latest', async (req, res) => {
   }
 });
 
+console.log("Registering route: /:index");
 // 2. GET /api/products/:index (Product Details)
 router.get('/:index', async (req, res) => {
   try {

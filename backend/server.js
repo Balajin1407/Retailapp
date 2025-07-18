@@ -20,15 +20,19 @@ mongoose.connect(process.env.MONGO_URI, {
 .catch((err) => console.error('MongoDB connection error:', err));
 
 // Test route
+console.log("Registering route: / (root)");
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
 // API routes
+console.log("Registering route: /api/products");
 app.use('/api/products', require('./routes/products'));
+console.log("Registering route: /api/categories");
 app.use('/api/categories', require('./routes/categories'));
 
 // Catch-all: serve index.html for frontend routes (after API routes)
+console.log("Registering route: * (catch-all)");
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 
+console.log("Registering route: / (categories)");
 // GET /api/categories (Categories List)
 router.get('/', async (req, res) => {
   try {
