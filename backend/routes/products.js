@@ -45,21 +45,13 @@ router.get('/search', async (req, res) => {
 
     let query = {};
     if (q) {
-      const indexValue = parseInt(q);
-      if (!isNaN(indexValue)) {
-        // If q is a number, search only by Index
-        query = { Index: indexValue };
+      // If q is a pure number, search only by Index
+      if (/^\d+$/.test(q.trim())) {
+        query = { Index: parseInt(q, 10) };
       } else {
-        // If q is a string, match both singular and plural forms in Name
-        let base = q.toLowerCase();
-        let regex;
-        if (base.endsWith('s')) {
-          // If query ends with 's', also match without 's'
-          regex = new RegExp(`${base.slice(0, -1)}s?`, 'i');
-        } else {
-          // If query doesn't end with 's', also match with 's'
-          regex = new RegExp(`${base}s?`, 'i');
-        }
+        // Flexible substring match for singular/plural (e.g., scanner/scanners)
+        let base = q.toLowerCase().replace(/s$/, '');
+        let regex = new RegExp(base + 's?', 'i');
         query = { Name: { $regex: regex } };
       }
     }
@@ -94,14 +86,18 @@ router.get('/latest', async (req, res) => {
   }
 });
 
-// 2. GET /api/products/:id (Product Details)
-router.get('/:id', async (req, res) => {
+// 2. GET /api/products/:index (Product Details)
+router.get('/:index', async (req, res) => {
   try {
-    const product = await Product.findOne({ "Internal ID": req.params.id });
+    const indexValue = parseInt(req.params.index, 10);
+    if (isNaN(indexValue)) {
+      return res.status(400).json({ message: 'Invalid index parameter' });
+    }
+    const product = await Product.findOne({ Index: indexValue });
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (err) {
-    console.error('Error in GET /api/products/:id:', err);
+    console.error('Error in GET /api/products/:index:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
