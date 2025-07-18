@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { fetchProductsPaginated, Product } from "@/lib/productApi";
+import { CATEGORY_GROUPS } from "../data/categoryGroups";
 
 const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,6 +16,9 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
   const [sortBy, setSortBy] = useState("name");
+  const [searchParams] = useSearchParams();
+
+  const group = searchParams.get("group");
 
   useEffect(() => {
     setLoading(true);
@@ -23,6 +27,9 @@ const Products = () => {
         const { products, pagination } = await fetchProductsPaginated(currentPage);
         setProducts(products);
         setPagination(pagination);
+        // Log all unique categories and the current group for debugging
+        console.log('Unique categories:', [...new Set(products.map(p => p.category))]);
+        console.log('Current group:', group);
       } catch (e) {
         setProducts([]);
         setPagination({ page: 1, totalPages: 1, total: 0 });
@@ -32,8 +39,15 @@ const Products = () => {
     fetchProducts();
   }, [currentPage]);
 
+  // Filter by group if present
+  let filteredProducts = products;
+  if (group && CATEGORY_GROUPS[group]) {
+    const categories = CATEGORY_GROUPS[group];
+    filteredProducts = products.filter(product => categories.includes(product.category));
+  }
+
   // Sort products client-side (optional, can be removed if not needed)
-  const sortedProducts = [...products].sort((a, b) => {
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case "name":
         return a.name.localeCompare(b.name);
@@ -101,9 +115,11 @@ const Products = () => {
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">All Products</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {group && CATEGORY_GROUPS[group] ? `${group} Products` : "All Products"}
+          </h1>
           <p className="text-muted-foreground">
-            {loading ? 'Loading products...' : `Showing page ${pagination.page} of ${pagination.totalPages} (${pagination.total} products)`}
+            {loading ? 'Loading products...' : `Showing page ${pagination.page} of ${pagination.totalPages} (${filteredProducts.length} products${group && CATEGORY_GROUPS[group] ? ` in ${group}` : ''})`}
           </p>
         </div>
         {/* Sort Dropdown */}
@@ -130,7 +146,7 @@ const Products = () => {
           ))}
         </div>
         {/* No Results Message */}
-        {!loading && products.length === 0 && (
+        {!loading && filteredProducts.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No products found.</p>
           </div>

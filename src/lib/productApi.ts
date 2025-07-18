@@ -19,8 +19,8 @@ export interface Product {
   };
 }
 
-const API_URL = 'http://34.142.139.231:5000/api/products';
-const IMAGE_BASE_URL = 'http://34.142.139.231:5000/images/';
+const API_URL = 'http://34.142.139.231/api/products';
+const IMAGE_BASE_URL = 'http://34.142.139.231/images/';
 
 // Helper to map API product to app Product type
 function mapApiProduct(apiProduct: any): Product {

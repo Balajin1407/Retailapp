@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   const footerLinks = {
     shop: [
-      { name: "Electronics", href: "/products?category=electronics" },
-      { name: "Furniture", href: "/products?category=furniture" },
-      { name: "Clothing", href: "/products?category=clothing" },
-      { name: "Home & Garden", href: "/products?category=home-garden" },
+      { name: "Electronics", href: "/products?group=Electronics" },
+      { name: "Furniture", href: "/products?group=Furniture" },
+      { name: "Clothing", href: "/products?group=Clothing" },
+      { name: "Home & Garden", href: "/products?group=Home%20%26%20Garden" },
     ],
     customerService: [
       { name: "Contact Us", href: "/contact" },
