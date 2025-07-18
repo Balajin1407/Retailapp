@@ -45,17 +45,19 @@ router.get('/search', async (req, res) => {
 
     let query = {};
     if (q) {
-      // Build a regex to match both singular and plural forms
-      let base = q.toLowerCase();
-      let regex;
-      if (base.endsWith('s')) {
-        // If query ends with 's', also match without 's'
-        regex = new RegExp(`^${base}$|^${base.slice(0, -1)}$`, 'i');
+      const indexValue = parseInt(q);
+      if (!isNaN(indexValue)) {
+        // If q is a number, search by Index OR Name
+        query = {
+          $or: [
+            { Index: indexValue },
+            { Name: { $regex: q, $options: 'i' } }
+          ]
+        };
       } else {
-        // If query doesn't end with 's', also match with 's'
-        regex = new RegExp(`^${base}$|^${base}s$`, 'i');
+        // If q is not a number, search by Name only
+        query = { Name: { $regex: q, $options: 'i' } };
       }
-      query = { Name: { $regex: regex } };
     }
 
     const total = await Product.countDocuments(query);
