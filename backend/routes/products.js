@@ -47,16 +47,20 @@ router.get('/search', async (req, res) => {
     if (q) {
       const indexValue = parseInt(q);
       if (!isNaN(indexValue)) {
-        // If q is a number, search by Index OR Name
-        query = {
-          $or: [
-            { Index: indexValue },
-            { Name: { $regex: q, $options: 'i' } }
-          ]
-        };
+        // If q is a number, search only by Index
+        query = { Index: indexValue };
       } else {
-        // If q is not a number, search by Name only
-        query = { Name: { $regex: q, $options: 'i' } };
+        // If q is a string, match both singular and plural forms in Name
+        let base = q.toLowerCase();
+        let regex;
+        if (base.endsWith('s')) {
+          // If query ends with 's', also match without 's'
+          regex = new RegExp(`${base.slice(0, -1)}s?`, 'i');
+        } else {
+          // If query doesn't end with 's', also match with 's'
+          regex = new RegExp(`${base}s?`, 'i');
+        }
+        query = { Name: { $regex: regex } };
       }
     }
 
