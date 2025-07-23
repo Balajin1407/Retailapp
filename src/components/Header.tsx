@@ -1,19 +1,38 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ShoppingCart, Menu, Search, Heart, Package } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
+import { useState, useEffect } from "react";
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { getTotalItems } = useCart();
   const { favorites } = useFavorites();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Update search term when URL params change (for search page)
+  useEffect(() => {
+    const urlSearchTerm = searchParams.get("q") || "";
+    setSearchTerm(urlSearchTerm);
+  }, [searchParams]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
+
+  const isOnSearchPage = location.pathname === "/search";
 
   return (
     <header className="bg-background border-b border-border sticky top-0 z-50">
@@ -62,13 +81,16 @@ const Header = () => {
 
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex items-center space-x-4 flex-1 max-w-md mx-8">
-            <div className="relative flex-1">
+            <form onSubmit={handleSearch} className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search products..."
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={isOnSearchPage ? "Search by ID, name, brand, or category..." : "Search products..."}
                 className="pl-10"
               />
-            </div>
+            </form>
           </div>
 
           {/* Action Buttons */}
@@ -110,13 +132,16 @@ const Header = () => {
 
         {/* Mobile Search Bar */}
         <div className="md:hidden pb-4">
-          <div className="relative">
+          <form onSubmit={handleSearch} className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search products..."
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={isOnSearchPage ? "Search by ID, name, brand, or category..." : "Search products..."}
               className="pl-10"
             />
-          </div>
+          </form>
         </div>
       </div>
     </header>

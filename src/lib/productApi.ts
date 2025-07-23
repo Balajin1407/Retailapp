@@ -22,8 +22,14 @@ export interface Product {
 const API_URL = 'http://34.142.139.231/api/products';
 const IMAGE_BASE_URL = 'http://34.142.139.231/images/';
 
+// Counter for cycling through images
+let imageCounter = 0;
+
 // Helper to map API product to app Product type
 function mapApiProduct(apiProduct: any): Product {
+  const imageIndex = imageCounter % imageMap.length;
+  imageCounter++;
+  
   return {
     id: apiProduct.Index, // or parseInt(apiProduct.Index)
     name: apiProduct.Name,
@@ -32,7 +38,7 @@ function mapApiProduct(apiProduct: any): Product {
     price: Number(apiProduct.Price),
     stock: Number(apiProduct.Stock),
     internalId: apiProduct["Internal ID"] || apiProduct.InternalID || apiProduct.internalId || '',
-    image: apiProduct.Image && !apiProduct.Image.startsWith('http') ? IMAGE_BASE_URL + apiProduct.Image : apiProduct.Image,
+    image: imageMap[imageIndex], // Use our real product images
     description: apiProduct.ShortDescription || '',
     specifications: {
       color: apiProduct.Color || '',
@@ -86,3 +92,73 @@ export async function fetchProductsPaginated(page = 1) {
     pagination: res.data.pagination,
   };
 } 
+
+// Enhanced product mapping with real product images
+const enhanceProduct = (product: any, index: number): Product => {
+  const imageIndex = index % imageMap.length;
+  
+  return {
+    id: product.id,
+    internalId: product.internalId,
+    name: product.name,
+    brand: product.brand,
+    category: product.category,
+    price: parseFloat(product.price),
+    stock: parseInt(product.stock),
+    image: imageMap[imageIndex],
+    description: product.description,
+    specifications: {
+      color: product.color || '',
+      size: product.size || '',
+      ean: product.ean || '',
+      availability: product.availability || 'In Stock',
+    },
+  };
+};
+
+// Image mapping for real product images
+const imageMap = [
+  '/lovable-uploads/1.jpg',
+  '/lovable-uploads/2.jpg',
+  '/lovable-uploads/3.jpg',
+  '/lovable-uploads/4.jpg',
+  '/lovable-uploads/5.jpg',
+  '/lovable-uploads/6.jpg',
+  '/lovable-uploads/7.jpg',
+  '/lovable-uploads/8.jpg',
+  '/lovable-uploads/9.jpg',
+  '/lovable-uploads/10.jpg',
+  '/lovable-uploads/11.jpg',
+  '/lovable-uploads/12.jpg',
+  '/lovable-uploads/13.jpg',
+  '/lovable-uploads/14.jpg',
+  '/lovable-uploads/15.jpg',
+  '/lovable-uploads/16.jpg',
+  '/lovable-uploads/17.jpg',
+  '/lovable-uploads/18.jpg',
+  '/lovable-uploads/19.jpg',
+  '/lovable-uploads/20.jpg',
+];
+
+const fallbackImageMap = [
+  '/lovable-uploads/1.jpg',
+  '/lovable-uploads/2.jpg',
+  '/lovable-uploads/3.jpg',
+  '/lovable-uploads/4.jpg',
+  '/lovable-uploads/5.jpg',
+  '/lovable-uploads/6.jpg',
+  '/lovable-uploads/7.jpg',
+  '/lovable-uploads/8.jpg',
+  '/lovable-uploads/9.jpg',
+  '/lovable-uploads/10.jpg',
+  '/lovable-uploads/11.jpg',
+  '/lovable-uploads/12.jpg',
+  '/lovable-uploads/13.jpg',
+  '/lovable-uploads/14.jpg',
+  '/lovable-uploads/15.jpg',
+  '/lovable-uploads/16.jpg',
+  '/lovable-uploads/17.jpg',
+  '/lovable-uploads/18.jpg',
+  '/lovable-uploads/19.jpg',
+  '/lovable-uploads/20.jpg',
+]; 
