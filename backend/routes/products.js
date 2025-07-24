@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 60 }); // cache for 60 seconds
 
 // Helper for pagination metadata
 function getPagination(page, limit, total) {
@@ -15,43 +17,62 @@ function getPagination(page, limit, total) {
   };
 }
 
+// Add this helper at the top of the file
+function errorResponse(res, status, error, message, details = null) {
+  const body = { error, message };
+  if (details) body.details = details;
+  return res.status(status).json(body);
+}
+
 console.log("Registering route: /");
 // 1. GET /api/products (Product Listing)
 router.get('/', async (req, res) => {
-  try {
-    let page = parseInt(req.query.page) || 1;
-    let limit = Math.min(parseInt(req.query.limit) || 50, 100);
+  let page = parseInt(req.query.page) || 1;
+  let limit = Math.min(parseInt(req.query.limit) || 50, 100);
+  const cacheKey = `products:${page}:${limit}`;
 
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return res.json(cached);
+  }
+
+  try {
     const total = await Product.countDocuments();
     const products = await Product.find({}, { Description: 0 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    res.json({
+    const response = {
       products,
       pagination: getPagination(page, limit, total)
-    });
+    };
+    cache.set(cacheKey, response);
+    res.json(response);
   } catch (err) {
     console.error('Error in GET /api/products:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    return errorResponse(res, 500, "ServerError", "Internal server error");
   }
 });
 
 console.log("Registering route: /search");
-// 3. GET /api/products/search (Search by Internal ID or Name)
+// 3. GET /api/products/search (Search by Index or Name)
 router.get('/search', async (req, res) => {
-  try {
-    let page = parseInt(req.query.page) || 1;
-    let limit = Math.min(parseInt(req.query.limit) || 50, 100);
-    const q = req.query.q || '';
+  let page = parseInt(req.query.page) || 1;
+  let limit = Math.min(parseInt(req.query.limit) || 50, 100);
+  const q = req.query.q || '';
+  const cacheKey = `search:${q}:${page}:${limit}`;
 
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return res.json(cached);
+  }
+
+  try {
     let query = {};
     if (q) {
-      // If q is a pure number, search only by Index
       if (/^\d+$/.test(q.trim())) {
         query = { Index: parseInt(q, 10) };
       } else {
-        // Flexible substring match for singular/plural (e.g., scanner/scanners)
         let base = q.toLowerCase().replace(/s$/, '');
         let regex = new RegExp(base + 's?', 'i');
         query = { Name: { $regex: regex } };
@@ -63,46 +84,67 @@ router.get('/search', async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
-    res.json({
+    const response = {
       products,
       pagination: getPagination(page, limit, total),
-    });
+    };
+    cache.set(cacheKey, response);
+    res.json(response);
   } catch (err) {
     console.error('Error in GET /api/products/search:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    return errorResponse(res, 500, "ServerError", "Internal server error");
   }
 });
 
 console.log("Registering route: /latest");
 // 5. GET /api/products/latest (Latest Products)
 router.get('/latest', async (req, res) => {
+  let limit = Math.min(parseInt(req.query.limit) || 10, 100);
+  const cacheKey = `latest:${limit}`;
+
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return res.json(cached);
+  }
+
   try {
-    let limit = Math.min(parseInt(req.query.limit) || 10, 100);
     const products = await Product.find({}, { Description: 0 })
       .sort({ Index: -1 })
       .limit(limit);
 
-    res.json({ products });
+    const response = { products };
+    cache.set(cacheKey, response);
+    res.json(response);
   } catch (err) {
     console.error('Error in GET /api/products/latest:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    return errorResponse(res, 500, "ServerError", "Internal server error");
   }
 });
 
 console.log("Registering route: /:index");
 // 2. GET /api/products/:index (Product Details)
 router.get('/:index', async (req, res) => {
+  const indexValue = parseInt(req.params.index, 10);
+  if (isNaN(indexValue)) {
+    return errorResponse(res, 400, "ValidationError", "Invalid index parameter");
+  }
+
+  const cacheKey = `product:${indexValue}`;
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return res.json(cached);
+  }
+
   try {
-    const indexValue = parseInt(req.params.index, 10);
-    if (isNaN(indexValue)) {
-      return res.status(400).json({ message: 'Invalid index parameter' });
-    }
     const product = await Product.findOne({ Index: indexValue });
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (!product) {
+      return errorResponse(res, 404, "NotFound", "Product not found");
+    }
+    cache.set(cacheKey, product);
     res.json(product);
   } catch (err) {
     console.error('Error in GET /api/products/:index:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    return errorResponse(res, 500, "ServerError", "Internal server error");
   }
 });
 
