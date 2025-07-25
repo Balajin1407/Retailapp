@@ -39,6 +39,7 @@ router.get('/', async (req, res) => {
   try {
     const total = await Product.countDocuments();
     const products = await Product.find({}, { Description: 0 })
+      .sort({ Index: 1 }) // Ensure products are sorted by Index ascending
       .skip((page - 1) * limit)
       .limit(limit);
 
