@@ -19,6 +19,7 @@ export interface Product {
   };
 }
 
+<<<<<<< Updated upstream
 const API_URL = 'https://34.142.139.231/api/products';
 const IMAGE_BASE_URL = 'https://34.142.139.231/images/';
 
@@ -48,6 +49,10 @@ const imageMap = [
 
 // Counter for cycling through images
 let imageCounter = 0;
+=======
+const API_URL = 'http://34.142.139.231:5000/api/products';
+const IMAGE_BASE_URL = 'http://34.142.139.231/images/';
+>>>>>>> Stashed changes
 
 // Helper to map API product to app Product type
 function mapApiProduct(apiProduct: any): Product {
@@ -213,7 +218,11 @@ export async function searchProductsByQuery(query: string): Promise<Product[]> {
     const res = await axios.get(`${API_URL}/search?q=${encodeURIComponent(query)}`);
     return res.data.products.map(mapApiProduct);
   } catch (error) {
+<<<<<<< Updated upstream
     console.error('Error searching products:', error);
+=======
+    console.warn('API search failed, falling back to local search:', error);
+>>>>>>> Stashed changes
     // Fallback to local search if API fails
     return searchProductsLocally(query);
   }
