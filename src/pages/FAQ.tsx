@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
+import { Phone } from "lucide-react";
 
 const FAQ = () => {
   const faqs = [
@@ -92,12 +93,15 @@ const FAQ = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="text-center">
                   <p className="font-semibold">Email Support</p>
-                  <p className="text-sm text-muted-foreground">support@techstore.com</p>
+                  <p className="text-sm text-muted-foreground">support@vibekart.com</p>
                   <p className="text-xs text-muted-foreground">Response within 24 hours</p>
                 </div>
                 <div className="text-center">
                   <p className="font-semibold">Phone Support</p>
-                  <p className="text-sm text-muted-foreground">1-800-TECHSTORE</p>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">1-800-VIBEKART</p>
+                  </div>
                   <p className="text-xs text-muted-foreground">Mon-Fri 9AM-6PM PST</p>
                 </div>
               </div>

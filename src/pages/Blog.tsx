@@ -55,7 +55,7 @@ const Blog = () => {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-4">TechStore Blog</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-4">VibeKart Blog</h1>
             <p className="text-muted-foreground text-lg">
               Stay informed with the latest tech trends, product reviews, and industry insights.
             </p>

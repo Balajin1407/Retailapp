@@ -105,10 +105,10 @@ const Footer = () => {
         <div className="border-t border-border mt-8 pt-8 text-center">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-2xl font-bold text-gradient mb-4 md:mb-0">
-              TechStore
+              VibeKart
             </div>
             <p className="text-muted-foreground text-sm">
-              © 2024 TechStore. All rights reserved.
+              © 2024 VibeKart. All rights reserved.
             </p>
           </div>
         </div>

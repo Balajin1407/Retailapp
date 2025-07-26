@@ -6,48 +6,42 @@ import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Youtube, Linkedin, MessageCircle } from "lucide-react";
 
 const Social = () => {
-  const socialPlatforms = [
+  const socialLinks = [
     {
       name: "Facebook",
       icon: Facebook,
-      followers: "25K",
-      description: "Latest product updates and community discussions",
-      url: "https://facebook.com/techstore"
+      url: "https://facebook.com/vibekart",
+      description: "Follow us for product updates and community engagement"
     },
     {
       name: "Twitter",
       icon: Twitter,
-      followers: "15K",
-      description: "Real-time updates, tech news, and customer support",
-      url: "https://twitter.com/techstore"
+      url: "https://twitter.com/vibekart",
+      description: "Get real-time updates and tech news"
     },
     {
       name: "Instagram",
       icon: Instagram,
-      followers: "30K",
-      description: "Behind-the-scenes content and product showcases",
-      url: "https://instagram.com/techstore"
+      url: "https://instagram.com/vibekart",
+      description: "Visual product showcases and lifestyle content"
     },
     {
       name: "YouTube",
       icon: Youtube,
-      followers: "12K",
-      description: "Product reviews, tutorials, and tech tips",
-      url: "https://youtube.com/techstore"
+      url: "https://youtube.com/vibekart",
+      description: "Product reviews, tutorials, and tech content"
     },
     {
       name: "LinkedIn",
       icon: Linkedin,
-      followers: "8K",
-      description: "Company updates and industry insights",
-      url: "https://linkedin.com/company/techstore"
+      url: "https://linkedin.com/company/vibekart",
+      description: "Professional updates and company news"
     },
     {
       name: "Discord",
       icon: MessageCircle,
-      followers: "5K",
-      description: "Join our community for discussions and support",
-      url: "https://discord.gg/techstore"
+      url: "https://discord.gg/vibekart",
+      description: "Join our community for discussions and support"
     }
   ];
 
@@ -65,15 +59,12 @@ const Social = () => {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {socialPlatforms.map((platform) => (
+            {socialLinks.map((platform) => (
               <Card key={platform.name} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
                   <platform.icon className="h-12 w-12 text-primary mx-auto mb-2" />
-                  <CardTitle className="flex items-center justify-center gap-2">
+                  <CardTitle className="text-center">
                     {platform.name}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      {platform.followers} followers
-                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">

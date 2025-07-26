@@ -57,14 +57,14 @@ const Contact = () => {
                     <Mail className="h-5 w-5 text-primary" />
                     <div>
                       <p className="font-medium">Email</p>
-                      <p className="text-sm text-muted-foreground">support@techstore.com</p>
+                      <p className="text-sm text-muted-foreground">support@vibekart.com</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Phone className="h-5 w-5 text-primary" />
                     <div>
                       <p className="font-medium">Phone</p>
-                      <p className="text-sm text-muted-foreground">1-800-TECHSTORE</p>
+                      <p className="text-sm text-muted-foreground">1-800-VIBEKART</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

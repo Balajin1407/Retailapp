@@ -36,7 +36,7 @@ const Careers = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Careers at TechStore</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-4">Careers at VibeKart</h1>
           <p className="text-muted-foreground text-lg mb-8">
             Join our team and help shape the future of e-commerce. We're looking for passionate individuals 
             who want to make a difference.

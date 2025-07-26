@@ -98,12 +98,9 @@ const Privacy = () => {
                 <CardTitle>Contact Us</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">
-                  If you have any questions about this Privacy Policy, please contact us at:
-                  <br />
-                  Email: privacy@techstore.com
-                  <br />
-                  Phone: 1-800-TECHSTORE
+                <p className="text-sm text-muted-foreground">
+                  Email: privacy@vibekart.com<br />
+                  Phone: 1-800-VIBEKART
                 </p>
               </CardContent>
             </Card>
