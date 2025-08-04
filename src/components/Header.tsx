@@ -1,24 +1,14 @@
-<<<<<<< Updated upstream
-
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-=======
-import { Link, useLocation, useNavigate } from "react-router-dom";
->>>>>>> Stashed changes
 import { ShoppingCart, Menu, Search, Heart, Package } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
-<<<<<<< Updated upstream
 import { useState, useEffect } from "react";
-=======
-import { useState } from "react";
->>>>>>> Stashed changes
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-<<<<<<< Updated upstream
   const [searchParams] = useSearchParams();
   const { getTotalItems } = useCart();
   const { favorites } = useFavorites();
@@ -29,11 +19,6 @@ const Header = () => {
     const urlSearchTerm = searchParams.get("q") || "";
     setSearchTerm(urlSearchTerm);
   }, [searchParams]);
-=======
-  const { getTotalItems } = useCart();
-  const { favorites } = useFavorites();
-  const [searchQuery, setSearchQuery] = useState("");
->>>>>>> Stashed changes
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -41,24 +26,12 @@ const Header = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-<<<<<<< Updated upstream
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
 
   const isOnSearchPage = location.pathname === "/search";
-=======
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-    }
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
->>>>>>> Stashed changes
 
   return (
     <header className="bg-background border-b border-border sticky top-0 z-50">
@@ -115,8 +88,6 @@ const Header = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={isOnSearchPage ? "Search by ID, name, brand, or category..." : "Search products..."}
                 className="pl-10"
-                value={searchQuery}
-                onChange={handleSearchChange}
               />
             </form>
           </div>
@@ -168,8 +139,6 @@ const Header = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={isOnSearchPage ? "Search by ID, name, brand, or category..." : "Search products..."}
               className="pl-10"
-              value={searchQuery}
-              onChange={handleSearchChange}
             />
           </form>
         </div>
